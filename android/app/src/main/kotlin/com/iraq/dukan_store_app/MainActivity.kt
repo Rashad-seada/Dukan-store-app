@@ -1,4 +1,4 @@
-package com.example.dukan_store_app
+package com.iraq.dukan_store_app
 
 import io.flutter.embedding.android.FlutterActivity
 
