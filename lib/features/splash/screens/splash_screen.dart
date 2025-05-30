@@ -9,7 +9,6 @@ import 'package:dukan_store_app/helper/route_helper.dart';
 import 'package:dukan_store_app/util/app_constants.dart';
 import 'package:dukan_store_app/util/dimensions.dart';
 import 'package:dukan_store_app/util/images.dart';
-import 'package:dukan_store_app/util/styles.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 
@@ -22,7 +21,6 @@ class SplashScreen extends StatefulWidget {
 }
 
 class SplashScreenState extends State<SplashScreen> {
-
   final GlobalKey<ScaffoldState> _globalKey = GlobalKey();
   StreamSubscription<List<ConnectivityResult>>? _onConnectivityChanged;
 
@@ -31,17 +29,23 @@ class SplashScreenState extends State<SplashScreen> {
     super.initState();
 
     bool firstTime = true;
-    _onConnectivityChanged = Connectivity().onConnectivityChanged.listen((List<ConnectivityResult> result) {
-      bool isConnected = result.contains(ConnectivityResult.wifi) || result.contains(ConnectivityResult.mobile);
+    _onConnectivityChanged = Connectivity()
+        .onConnectivityChanged
+        .listen((List<ConnectivityResult> result) {
+      bool isConnected = result.contains(ConnectivityResult.wifi) ||
+          result.contains(ConnectivityResult.mobile);
 
-      if(!firstTime) {
-        isConnected ? ScaffoldMessenger.of(Get.context!).hideCurrentSnackBar() : const SizedBox();
+      if (!firstTime) {
+        isConnected
+            ? ScaffoldMessenger.of(Get.context!).hideCurrentSnackBar()
+            : const SizedBox();
         ScaffoldMessenger.of(Get.context!).showSnackBar(SnackBar(
           backgroundColor: isConnected ? Colors.green : Colors.red,
           duration: Duration(seconds: isConnected ? 3 : 6000),
-          content: Text(isConnected ? 'connected'.tr : 'no_connection'.tr, textAlign: TextAlign.center),
+          content: Text(isConnected ? 'connected'.tr : 'no_connection'.tr,
+              textAlign: TextAlign.center),
         ));
-        if(isConnected) {
+        if (isConnected) {
           _route();
         }
       }
@@ -51,7 +55,6 @@ class SplashScreenState extends State<SplashScreen> {
 
     Get.find<SplashController>().initSharedData();
     _route();
-
   }
 
   @override
@@ -66,15 +69,16 @@ class SplashScreenState extends State<SplashScreen> {
       if (isSuccess) {
         Timer(const Duration(seconds: 1), () async {
           double? minimumVersion = _getMinimumVersion();
-          bool isMaintenanceMode = Get.find<SplashController>().configModel!.maintenanceMode!;
+          bool isMaintenanceMode =
+              Get.find<SplashController>().configModel!.maintenanceMode!;
           bool needsUpdate = AppConstants.appVersion < minimumVersion!;
 
           if (needsUpdate || isMaintenanceMode) {
             Get.offNamed(RouteHelper.getUpdateRoute(needsUpdate));
-          }else{
-            if(widget.body != null) {
+          } else {
+            if (widget.body != null) {
               await _handleNotificationRouting(widget.body);
-            }else{
+            } else {
               await _handleDefaultRouting();
             }
           }
@@ -92,19 +96,35 @@ class SplashScreenState extends State<SplashScreen> {
     return 0;
   }
 
-  Future<void> _handleNotificationRouting(NotificationBodyModel? notificationBody) async {
+  Future<void> _handleNotificationRouting(
+      NotificationBodyModel? notificationBody) async {
     final notificationType = notificationBody?.notificationType;
-    
+
     final Map<NotificationType, Function> notificationActions = {
-      NotificationType.order: () => Get.toNamed(RouteHelper.getOrderDetailsRoute(notificationBody?.orderId, fromNotification: true)),
-      NotificationType.advertisement: () => Get.toNamed(RouteHelper.getAdvertisementDetailsScreen(advertisementId: notificationBody?.advertisementId, fromNotification: true)),
-      NotificationType.block: () => Get.offAllNamed(RouteHelper.getSignInRoute()),
-      NotificationType.unblock: () => Get.offAllNamed(RouteHelper.getSignInRoute()),
-      NotificationType.withdraw: () => Get.to(const DashboardScreen(pageIndex: 3)),
-      NotificationType.campaign: () => Get.toNamed(RouteHelper.getCampaignDetailsRoute(id: notificationBody?.campaignId, fromNotification: true)),
-      NotificationType.message: () => Get.toNamed(RouteHelper.getChatRoute(notificationBody: notificationBody, conversationId: notificationBody?.conversationId, fromNotification: true)),
-      NotificationType.subscription: () => Get.toNamed(RouteHelper.getMySubscriptionRoute(fromNotification: true)),
-      NotificationType.general: () => Get.toNamed(RouteHelper.getNotificationRoute(fromNotification: true)),
+      NotificationType.order: () => Get.toNamed(
+          RouteHelper.getOrderDetailsRoute(notificationBody?.orderId,
+              fromNotification: true)),
+      NotificationType.advertisement: () => Get.toNamed(
+          RouteHelper.getAdvertisementDetailsScreen(
+              advertisementId: notificationBody?.advertisementId,
+              fromNotification: true)),
+      NotificationType.block: () =>
+          Get.offAllNamed(RouteHelper.getSignInRoute()),
+      NotificationType.unblock: () =>
+          Get.offAllNamed(RouteHelper.getSignInRoute()),
+      NotificationType.withdraw: () =>
+          Get.to(const DashboardScreen(pageIndex: 3)),
+      NotificationType.campaign: () => Get.toNamed(
+          RouteHelper.getCampaignDetailsRoute(
+              id: notificationBody?.campaignId, fromNotification: true)),
+      NotificationType.message: () => Get.toNamed(RouteHelper.getChatRoute(
+          notificationBody: notificationBody,
+          conversationId: notificationBody?.conversationId,
+          fromNotification: true)),
+      NotificationType.subscription: () => Get.toNamed(
+          RouteHelper.getMySubscriptionRoute(fromNotification: true)),
+      NotificationType.general: () =>
+          Get.toNamed(RouteHelper.getNotificationRoute(fromNotification: true)),
     };
 
     notificationActions[notificationType]?.call();
@@ -117,9 +137,9 @@ class SplashScreenState extends State<SplashScreen> {
       Get.offNamed(RouteHelper.getInitialRoute());
     } else {
       final bool showIntro = Get.find<SplashController>().showIntro();
-      if(AppConstants.languages.length > 1 && showIntro) {
+      if (AppConstants.languages.length > 1 && showIntro) {
         Get.offNamed(RouteHelper.getLanguageRoute('splash'));
-      }else {
+      } else {
         Get.offNamed(RouteHelper.getSignInRoute());
       }
     }
@@ -134,8 +154,8 @@ class SplashScreenState extends State<SplashScreen> {
           padding: const EdgeInsets.all(Dimensions.paddingSizeLarge),
           child: Column(mainAxisSize: MainAxisSize.min, children: [
             Image.asset(Images.logo, width: 200),
-            const SizedBox(height: Dimensions.paddingSizeSmall),
-            Text('suffix_name'.tr, style: robotoMedium, textAlign: TextAlign.center),
+            // const SizedBox(height: Dimensions.paddingSizeSmall),
+            //Text('suffix_name'.tr, style: robotoMedium, textAlign: TextAlign.center),
           ]),
         ),
       ),
